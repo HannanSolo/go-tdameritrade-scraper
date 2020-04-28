@@ -13,7 +13,7 @@ import (
 
 func main() {
 	//TODO make conditional if we have a valid refresh token
-	const clientID = "997F0OYWTJXUZZNG9HSNCFIAUHMGYBQW"
+	const clientID = "1FSINCAKAGNKFIY9HXI4V56GQVPHAALZ"
 	//obtain a initial auth	 token by auth through browser
 
 	reader := bufio.NewReader(os.Stdin)
@@ -46,7 +46,7 @@ func main() {
 		log.Fatalf("Error getting tokens %v", err)
 	}
 
-	fmt.Printf("%#v\n", han)
+	fmt.Printf("%v\n", han)
 
 	// get a initial refresh token.
 

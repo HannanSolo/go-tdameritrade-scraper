@@ -100,10 +100,11 @@ func (t TokenRequest) post() (resp TokenResponse, err error) {
 func (t *TokenManager) GetInitialTokens(code string) error {
 
 	req := TokenRequest{
-		GrantType:  "authorization_code",
-		Code:       code,
-		AccessType: "offline",
-		ClientID:   t.ClientID,
+		GrantType:   "authorization_code",
+		Code:        code,
+		AccessType:  "offline",
+		ClientID:    t.ClientID + "@AMER.OAUTHAP",
+		RedirectURI: "http://localhost",
 	}
 
 	res, err := req.post()

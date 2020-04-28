@@ -4,7 +4,7 @@ import (
 	"net/url"
 )
 
-const loginEndPoint = "https://auth.tdameritrade.com/oauth"
+const loginEndPoint = "https://auth.tdameritrade.com/auth"
 
 // Login holds our TD user's info
 type Login struct {
