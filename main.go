@@ -14,47 +14,60 @@ import (
 func main() {
 	//TODO make conditional if we have a valid refresh token
 	const clientID = "1FSINCAKAGNKFIY9HXI4V56GQVPHAALZ"
+
 	//obtain a initial auth	 token by auth through browser
-
-	reader := bufio.NewReader(os.Stdin)
-
-	login := auth.Login{ClientID: clientID, RedirectURI: "http://localhost"}
-
-	fmt.Printf("Put this URL into your browser to login\n %v\n", login.URL())
-
-	fmt.Print("Please paste the auth url you got: ")
-	text, err := reader.ReadString('\n')
-	if err != nil {
-		log.Fatalf("Error reading input: %v", err)
-	}
-
-	u, err := url.Parse(strings.TrimSpace(text))
-	if err != nil {
-		log.Fatalf("Error parsing url: %v", err)
-	}
-
-	code := login.ExtractCode(u)
-	fmt.Println("\n\n\n" + code)
-	if code == "" {
-		log.Fatal("Url did not contain a code parameter")
-	}
 
 	han := auth.TokenManager{ClientID: clientID}
 
-	err = han.GetInitialTokens(code)
-	if err != nil {
-		log.Fatalf("Error getting tokens %v", err)
+	const file = "cred.json"
+	if _, err := os.Stat(file); err == nil {
+
+		err = han.Load(file)
+		if err != nil {
+			log.Fatalf("Was not able to read cred file %v", err)
+		}
 	}
 
+	if han.LoginRequired() {
+		reader := bufio.NewReader(os.Stdin)
+
+		login := auth.Login{ClientID: clientID, RedirectURI: "http://localhost"}
+
+		fmt.Printf("Put this URL into your browser to login\n %v\n", login.URL())
+
+		fmt.Print("Please paste the auth url you got: ")
+		text, err := reader.ReadString('\n')
+		if err != nil {
+			log.Fatalf("Error reading input: %v", err)
+		}
+
+		u, err := url.Parse(strings.TrimSpace(text))
+		if err != nil {
+			log.Fatalf("Error parsing url: %v", err)
+		}
+
+		code := login.ExtractCode(u)
+		fmt.Println("\n\n\n" + code)
+		if code == "" {
+			log.Fatal("Url did not contain a code parameter")
+		}
+
+		err = han.GetInitialTokens(code)
+		if err != nil {
+			log.Fatalf("Error getting tokens %v", err)
+		}
+
+		han.Save(file)
+	}
+
+	if han.RefreshRequired() {
+		err := han.RefreshTokens()
+		if err != nil {
+			log.Fatalf("Error refreshing tokens %v", err)
+		}
+		han.Save(file)
+	}
 	fmt.Printf("%v\n", han)
-
-	// get a initial refresh token.
-
-	// - contruct post request with body parameters
-	// - Send post request to abtain refresh and auth token
-	// - Parse response into TokenResponse type
-	// - Validate contents
-	// - calculate absolute expire time
 
 }
 
