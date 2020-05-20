@@ -181,6 +181,22 @@ func (t *TokenManager) RefreshTokens() error {
 
 	return err
 }
+func (c TokenManager) AddAuthorization(r *http.Request) {
+
+	//add auth token to the header
+	bearer := "Bearer " + c.AccessToken.Code
+
+	r.Header.Add("Authorization", bearer)
+
+	//and add api key to the url
+
+	q, _ := url.ParseQuery(r.URL.RawQuery)
+
+	q.Add("apikey", c.ClientID)
+
+	r.URL.RawQuery = q.Encode()
+
+}
 
 // take above example response and test it
 // Deserialize json object using the json library and put into token response struct struct
