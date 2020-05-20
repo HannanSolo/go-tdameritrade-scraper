@@ -22,7 +22,7 @@ const gracePeriod = 40 * time.Second
 
 type TokenRequest struct {
 	GrantType    string `json:"grant_type"`
-	RefreshToken string `json: "refresh_token"`
+	RefreshToken string `json:"refresh_token"`
 	AccessType   string `json:"access_type"`
 	Code         string `json:"code"`
 	ClientID     string `json:"client_id"`
