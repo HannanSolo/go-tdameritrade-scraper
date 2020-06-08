@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -73,8 +74,8 @@ func main() {
 	}
 	//fmt.Printf("%v\n", han)
 
-	day1 := time.Unix(0, 1589290500000*int64(time.Millisecond)) //time.Date(2018, time.April, 20, 9, 30, 0, 0, time.Local)
-	day2 := time.Unix(0, 1589827680000*int64(time.Millisecond)) //time.Date(2018, time.April, 30, 16, 30, 0, 0, time.Local)
+	day1 := time.Unix(0, 1589990500000*int64(time.Millisecond)) //time.Date(2018, time.April, 20, 9, 30, 0, 0, time.Local)
+	day2 := time.Unix(0, 1590027680000*int64(time.Millisecond)) //time.Date(2018, time.April, 30, 16, 30, 0, 0, time.Local)
 	//create a request struct
 	amddata := scraper.Request{Ticker: "AMD", FrequencyType: scraper.Minute, Frequency: 1, EndDate: day2, StartDate: day1, ExtendedHoursData: false}
 
@@ -91,10 +92,15 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	body, _ := ioutil.ReadAll(resp.Body)
+	candles := new(scraper.Response)
 
-	fmt.Print(string(body))
+	json.Unmarshal(body, &candles)
+	fmt.Print(candles)
+	osFile, _ := scraper.TickerToFile("AMD")
+	candles.ToCSV(scraper.NewCandleWriter(osFile))
+	osFile.Close()
+
 }
 
 //

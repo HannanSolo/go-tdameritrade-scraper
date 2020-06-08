@@ -46,9 +46,9 @@ type Candle struct {
 }
 
 type Response struct {
-	Candles Candle `json:"candles"`
-	Empty   bool   `json:"empty"`
-	Symbol  string `json:"symbol"`
+	Candles []Candle `json:"candles"`
+	Empty   bool     `json:"empty"`
+	Symbol  string   `json:"symbol"`
 }
 
 func timeToUnixMsec(t time.Time) int64 {
@@ -58,6 +58,7 @@ func timeToUnixMsec(t time.Time) int64 {
 	return nsec.Milliseconds()
 }
 
+//HttpRequest atkes in a request struct to format it into a http.Request
 func (r *Request) HttpRequest() (*http.Request, error) {
 
 	params := make(url.Values)
@@ -79,4 +80,20 @@ func (r *Request) HttpRequest() (*http.Request, error) {
 	params.Set("needExtendedHoursData", fmt.Sprint(r.ExtendedHoursData))
 
 	return http.NewRequest("GET", fmt.Sprintf("%s/%s/pricehistory?%s", baseURL, r.Ticker, params.Encode()), nil)
+}
+
+//ToCSV iterates through a price history response candles and prints it to the csv
+func (r *Response) ToCSV(w CandleWriter) error {
+
+	for _, candle := range r.Candles {
+		err := w.Write(candle)
+		if err != nil {
+			return err
+		}
+	}
+	w.Flush()
+	if err := w.Error(); err != nil {
+		return fmt.Errorf("error writing csv: %v", err)
+	}
+	return nil
 }
